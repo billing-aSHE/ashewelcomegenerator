@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ashe Counseling – Welcome Message Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:          #ede9e0;
+      --card:        #faf7f3;
+      --dark:        #2b2825;
+      --dark-hover:  #1a1715;
+      --sage:        #6b7c5c;
+      --sage-light:  #e8ede3;
+      --sage-mid:    #c4cfba;
+      --tan:         #d6cfc4;
+      --text:        #2b2825;
+      --text-muted:  #7a746d;
+      --border:      #d4cdc5;
+      --cream-deep:  #e5e0d6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 32px 16px 56px;
+      color: var(--text);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    header h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--dark);
+      letter-spacing: 0.5px;
+    }
+
+    header p {
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      letter-spacing: 0.3px;
+    }
+
+    header .header-rule {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    header .header-rule::before,
+    header .header-rule::after {
+      content: '';
+      display: block;
+      width: 36px;
+      height: 1px;
+      background: var(--tan);
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(43,40,37,0.07);
+      max-width: 780px;
+      margin: 0 auto 24px;
+      padding: 28px 32px;
+      border: 1px solid var(--border);
+    }
+
+    /* ── Appointment Type Toggle ── */
+    .appt-toggle-wrap {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .appt-toggle-wrap p {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .appt-toggle {
+      display: inline-flex;
+      border-radius: 50px;
+      overflow: hidden;
+      border: 1.5px solid var(--dark);
+    }
+
+    .appt-toggle button {
+      padding: 9px 28px;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.18s;
+      background: transparent;
+      color: var(--dark);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .appt-toggle button.active {
+      background: var(--dark);
+      color: var(--card);
+    }
+
+    .appt-toggle button:first-child { border-right: 1px solid var(--dark); }
+
+    /* ── Teen Toggle ── */
+    .teen-toggle-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .teen-toggle-wrap label {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--sage);
+      cursor: pointer;
+      background: var(--sage-light);
+      border: 1.5px solid var(--sage-mid);
+      border-radius: 50px;
+      padding: 9px 20px;
+      transition: background 0.18s, border-color 0.18s, color 0.18s;
+    }
+
+    .teen-toggle-wrap label:has(input:checked) {
+      background: var(--sage);
+      border-color: var(--sage);
+      color: var(--card);
+    }
+
+    .teen-toggle-wrap input[type="checkbox"] {
+      width: 16px; height: 16px;
+      accent-color: var(--sage);
+      cursor: pointer;
+    }
+
+    /* ── Template Tabs ── */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      flex: 1 1 140px;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.18s;
+      text-align: center;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .tab-btn:hover { background: var(--cream-deep); border-color: var(--tan); color: var(--dark); }
+
+    .tab-btn.active {
+      background: var(--dark);
+      color: var(--card);
+      border-color: var(--dark);
+    }
+
+    /* ── Form Fields ── */
+    .fields-section h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      letter-spacing: 0.2px;
+    }
+
+    .fields-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 560px) { .fields-grid { grid-template-columns: 1fr; } }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    select {
+      padding: 9px 13px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.93rem;
+      color: var(--text);
+      transition: border-color 0.2s;
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--dark);
+      background: #fff;
+    }
+
+    select { cursor: pointer; }
+
+    /* Location checkboxes */
+    .location-group {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .location-group label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .location-group input[type="checkbox"] {
+      width: 16px; height: 16px; accent-color: var(--sage); cursor: pointer;
+    }
+
+    /* Virtual notice badge */
+    .virtual-notice {
+      display: none;
+      background: var(--sage-light);
+      border: 1.5px solid var(--sage-mid);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.87rem;
+      color: var(--sage);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .virtual-notice strong { display: block; margin-bottom: 2px; color: var(--sage); }
+
+    /* ── Generate Button ── */
+    .btn-generate {
+      display: block;
+      width: 100%;
+      margin-top: 22px;
+      padding: 14px;
+      background: var(--dark);
+      color: var(--card);
+      border: none;
+      border-radius: 50px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-generate:hover { background: var(--dark-hover); }
+
+    /* ── Output ── */
+    .output-card {
+      display: none;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .output-card.visible { display: block; }
+
+    .output-card .card { padding: 28px 32px; }
+
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .output-header h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .appt-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 50px;
+      background: var(--cream-deep);
+      color: var(--text-muted);
+      border: 1.5px solid var(--border);
+    }
+
+    .appt-badge.virtual { background: var(--sage-light); color: var(--sage); border-color: var(--sage-mid); }
+    .appt-badge.teen    { background: var(--sage); color: var(--card); border-color: var(--sage); }
+
+    .output-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-copy {
+      padding: 9px 22px;
+      background: var(--sage);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-copy:hover { background: #576647; }
+    .btn-copy.copied { background: #576647; }
+
+    #message-output {
+      white-space: pre-wrap;
+      font-size: 0.92rem;
+      line-height: 1.75;
+      color: var(--text);
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      min-height: 80px;
+    }
+
+    .tip {
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-align: center;
+      letter-spacing: 0.3px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-rule">Internal Tool</div>
+  <h1>Ashé Counseling &amp; Coaching</h1>
+  <p>Welcome Message Generator &mdash; select appointment type, pick a template, fill in client details, copy &amp; send.</p>
+</header>
+
+<!-- ── FORM CARD ── -->
+<div class="card">
+
+  <!-- Appointment Type Toggle -->
+  <div class="appt-toggle-wrap">
+    <p>Appointment Type</p>
+    <div class="appt-toggle">
+      <button id="btn-inperson" class="active" onclick="setApptType('inperson')">🏢 In-Person</button>
+      <button id="btn-virtual" onclick="setApptType('virtual')">💻 Virtual</button>
+    </div>
+  </div>
+
+  <!-- Teen Toggle -->
+  <div class="teen-toggle-wrap">
+    <label>
+      <input type="checkbox" id="teen-client" />
+      👦🏽 Teen / Adolescent Client
+    </label>
+  </div>
+
+  <!-- Template Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('deductible', this)">💳 Deductible</button>
+    <button class="tab-btn" onclick="switchTab('copay', this)">📋 Copay</button>
+    <button class="tab-btn" onclick="switchTab('medicaid', this)">🏥 Medicaid</button>
+    <button class="tab-btn" onclick="switchTab('covered', this)">✅ Covered 100%</button>
+  </div>
+
+  <!-- ── FIELDS: DEDUCTIBLE ── -->
+  <div id="fields-deductible" class="fields-section">
+    <h2>Deductible Template — Client Details</h2>
+    <div class="virtual-notice" id="vnotice-deductible">
+      <strong>Virtual Appointment</strong>
+      The link note will be included automatically: "The link to your virtual appointment will be sent via a confirmation 30 minutes prior to your scheduled time."
+    </div>
+    <div class="fields-grid">
+      <div class="field full">
+        <label>Provider</label>
+        <select id="ded-provider" onchange="syncProviders('ded')">
+          <option value="">— Select Clinician —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Estimated Session Cost ($)</label>
+        <input type="text" id="ded-cost" placeholder="e.g. 133.66" />
+      </div>
+      <div class="field">
+        <label>Remaining Deductible ($)</label>
+        <input type="text" id="ded-deductible" placeholder="e.g. 4000" />
+      </div>
+      <div class="field full" id="ded-location-row">
+        <label>Location(s) to Include</label>
+        <div class="location-group">
+          <label><input type="checkbox" id="ded-south" checked /> South Loop</label>
+          <label><input type="checkbox" id="ded-logan" checked /> Logan Square</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FIELDS: COPAY ── -->
+  <div id="fields-copay" class="fields-section" style="display:none">
+    <h2>Copay Template — Client Details</h2>
+    <div class="virtual-notice" id="vnotice-copay">
+      <strong>Virtual Appointment</strong>
+      The link note will be included automatically: "The link to your virtual appointment will be sent via a confirmation 30 minutes prior to your scheduled time."
+    </div>
+    <div class="fields-grid">
+      <div class="field full">
+        <label>Provider</label>
+        <select id="cop-provider" onchange="syncProviders('cop')">
+          <option value="">— Select Clinician —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Copay Amount ($)</label>
+        <input type="text" id="cop-cost" placeholder="e.g. 25" />
+      </div>
+      <div class="field full" id="cop-location-row">
+        <label>Location(s) to Include</label>
+        <div class="location-group">
+          <label><input type="checkbox" id="cop-south" checked /> South Loop</label>
+          <label><input type="checkbox" id="cop-logan" checked /> Logan Square</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FIELDS: MEDICAID ── -->
+  <div id="fields-medicaid" class="fields-section" style="display:none">
+    <h2>Medicaid Template — Client Details</h2>
+    <div class="virtual-notice" id="vnotice-medicaid">
+      <strong>Virtual Appointment</strong>
+      The link note will be included automatically: "The link to your virtual appointment will be sent via a confirmation 30 minutes prior to your scheduled time."
+    </div>
+    <div class="fields-grid">
+      <div class="field full">
+        <label>Provider</label>
+        <select id="med-provider" onchange="syncProviders('med')">
+          <option value="">— Select Clinician —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Coverage Month(s)</label>
+        <input type="text" id="med-month" placeholder="e.g. April  or  March and April" />
+      </div>
+      <div class="field full" id="med-location-row">
+        <label>Location(s) to Include</label>
+        <div class="location-group">
+          <label><input type="checkbox" id="med-south" checked /> South Loop</label>
+          <label><input type="checkbox" id="med-logan" checked /> Logan Square</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FIELDS: COVERED 100% ── -->
+  <div id="fields-covered" class="fields-section" style="display:none">
+    <h2>Covered 100% Template — Client Details</h2>
+    <div class="virtual-notice" id="vnotice-covered">
+      <strong>Virtual Appointment</strong>
+      The link note will be included automatically: "The link to your virtual appointment will be sent via a confirmation 30 minutes prior to your scheduled time."
+    </div>
+    <div class="fields-grid">
+      <div class="field full">
+        <label>Provider</label>
+        <select id="cov-provider" onchange="syncProviders('cov')">
+          <option value="">— Select Clinician —</option>
+        </select>
+      </div>
+      <div class="field full" id="cov-location-row">
+        <label>Location(s) to Include</label>
+        <div class="location-group">
+          <label><input type="checkbox" id="cov-south" checked /> South Loop</label>
+          <label><input type="checkbox" id="cov-logan" checked /> Logan Square</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-generate" onclick="generateMessage()">✨ Generate Message</button>
+</div>
+
+<!-- ── OUTPUT CARD ── -->
+<div class="output-card" id="output-card">
+  <div class="card">
+    <div class="output-header">
+      <div class="output-title-row">
+        <h2>📋 Your Welcome Message</h2>
+        <span class="appt-badge" id="output-badge">In-Person</span>
+      </div>
+      <button class="btn-copy" id="copy-btn" onclick="copyMessage()">Copy Message</button>
+    </div>
+    <div id="message-output"></div>
+    <p class="tip">Click "Copy Message" above, then paste directly into your email.</p>
+  </div>
+</div>
+
+<script>
+  const CLINICIANS = [
+    { name: 'Alexa Costa',  email: 'alexacosta@ashecc.com' },
+    { name: 'Aneisha',      email: 'aneisha@ashecc.com' },
+    { name: 'Anna',         email: 'anna@ashecc.com' },
+    { name: 'Aza',          email: 'aza@ashecc.com' },
+    { name: 'Brittany',     email: 'brittany@ashecc.com' },
+    { name: 'Carla',        email: 'carla@ashecc.com' },
+    { name: 'Carmen',       email: 'carmen@ashecc.com' },
+    { name: 'Cathy',        email: 'cathy@ashecc.com' },
+    { name: 'Crystol',      email: 'crystol@ashecc.com' },
+    { name: 'Cynthia',      email: 'cynthia@ashecc.com' },
+    { name: 'Dawnielle',    email: 'dawnielle@ashecc.com' },
+    { name: 'Deja',         email: 'deja@ashecc.com' },
+    { name: 'Diana',        email: 'diana@ashecc.com' },
+    { name: 'Erica',        email: 'erica@ashecc.com' },
+    { name: 'Gabriela',     email: 'gabriela@ashecc.com' },
+    { name: 'Kayla',        email: 'kayla@ashecc.com' },
+    { name: 'Kenya',        email: 'kenya@ashecc.com' },
+    { name: 'Kepi',         email: 'kepi@ashecc.com' },
+    { name: 'Larry',        email: 'larry@ashecc.com' },
+    { name: 'Laura',        email: 'laura@ashecc.com' },
+    { name: 'Nakia',        email: 'nakia@ashecc.com' },
+    { name: 'Pasquail',     email: 'pasquail@ashecc.com' },
+    { name: 'Sarah',        email: 'sarah@ashecc.com' },
+    { name: 'Tayo',         email: 'tayo@ashecc.com' },
+    { name: 'Terrez',       email: 'terrez@ashecc.com' },
+    { name: 'Valerie',      email: 'valerie@ashecc.com' },
+    { name: 'Vaquisha',     email: 'vaquisha@ashecc.com' },
+  ];
+
+  const PREFIXES = ['ded', 'cop', 'med', 'cov'];
+
+  function populateDropdowns() {
+    PREFIXES.forEach(function(prefix) {
+      var sel = document.getElementById(prefix + '-provider');
+      CLINICIANS.forEach(function(c) {
+        var opt = document.createElement('option');
+        opt.value = c.name;
+        opt.textContent = c.name;
+        sel.appendChild(opt);
+      });
+    });
+  }
+
+  function syncProviders(changedPrefix) {
+    var val = document.getElementById(changedPrefix + '-provider').value;
+    PREFIXES.forEach(function(prefix) {
+      if (prefix !== changedPrefix) {
+        document.getElementById(prefix + '-provider').value = val;
+      }
+    });
+  }
+
+  function getProviderInfo(prefix) {
+    var sel = document.getElementById(prefix + '-provider');
+    var name = sel.value;
+    if (!name) return { name: '[Provider Name]', email: '[Provider Email]' };
+    var match = CLINICIANS.find(function(c) { return c.name === name; });
+    var firstName = name.split(' ')[0];
+    return { name: firstName, email: match ? match.email : '[Provider Email]' };
+  }
+
+  let currentTab = 'deductible';
+  let apptType   = 'inperson';
+
+  const VIRTUAL_LINK_NOTE =
+    'Important Note About Your Virtual Appointment:\n' +
+    'The link to your virtual appointment will be sent via a confirmation 30 minutes prior to your scheduled time. ' +
+    'Please note that the link will only work within 30 minutes of your appointment time.';
+
+  /* ── Toggle appointment type ── */
+  function setApptType(type) {
+    apptType = type;
+    document.getElementById('btn-inperson').classList.toggle('active', type === 'inperson');
+    document.getElementById('btn-virtual').classList.toggle('active',  type === 'virtual');
+
+    ['deductible','copay','medicaid','covered'].forEach(function(t) {
+      var locRow = document.getElementById(getPrefix(t) + '-location-row');
+      var notice = document.getElementById('vnotice-' + t);
+      if (locRow) locRow.style.display = (type === 'inperson') ? '' : 'none';
+      if (notice) notice.style.display = (type === 'virtual')  ? 'flex' : 'none';
+    });
+
+    document.getElementById('output-card').classList.remove('visible');
+  }
+
+  function getPrefix(tab) {
+    var map = { deductible: 'ded', copay: 'cop', medicaid: 'med', covered: 'cov' };
+    return map[tab];
+  }
+
+  /* ── Switch template tab ── */
+  function switchTab(tab, btn) {
+    currentTab = tab;
+    document.querySelectorAll('.fields-section').forEach(function(el) { el.style.display = 'none'; });
+    document.getElementById('fields-' + tab).style.display = 'block';
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    setApptType(apptType);
+    document.getElementById('output-card').classList.remove('visible');
+  }
+
+  /* ── Location block (in-person only) ── */
+  function locationBlock(southChecked, loganChecked) {
+    var lines = [];
+    if (southChecked || loganChecked) lines.push('Location Details:');
+    if (southChecked) lines.push('• South Loop: 1550 S Indiana, Chicago, IL 60605 – Please call “Ashe Counseling” on the call box when you arrive.');
+    if (loganChecked) lines.push('• Logan Square: 2653 N Kedzie, Chicago, IL – Please ring the doorbell when you arrive. Our office is located on the second floor of the building.');
+    return lines.join('\n');
+  }
+
+  /* ── Generate ── */
+  function generateMessage() {
+    var msg      = '';
+    var isVirtual = (apptType === 'virtual');
+    var isTeen    = document.getElementById('teen-client').checked;
+    var apptWord  = isVirtual ? 'virtual' : 'in-person';
+
+    var INSURANCE_STANDARD =
+      'Important Note About Insurance:\n' +
+      'Ashé Counseling & Coaching LLC files insurance claims on your behalf as a courtesy. However, you are ultimately responsible for any costs not covered by your insurance. If your insurance company denies a claim, you may be billed for the difference between our standard session rate and any amount you’ve previously paid, unless otherwise approved by the owner.';
+
+    var TEEN_INTRO =
+      'Hello,\n\n' +
+      'Welcome to Ashé Counseling & Coaching. We are honored to support your teen and your family.\n\n' +
+      'We created a short video to help you understand what your teen can expect in therapy and how the process works:\n' +
+      'https://youtube.com/shorts/fr-EGgN1lXc?feature=share\n\n' +
+      'At Ashé, our goal is to provide a safe, supportive space for teens to talk openly, learn new coping skills, and work toward improving their emotional well-being. Therapy is collaborative, culturally responsive, and focused on helping your teen feel heard, respected, and empowered.';
+
+    var TEEN_AS_WE_BEGIN =
+      'As we begin:\n' +
+      '• Your teen’s therapist will work with them to build rapport, set goals, and establish a routine that feels comfortable.\n' +
+      '• Sessions are confidential, and we will always communicate with you about safety concerns, progress, and ways to support your teen at home.\n' +
+      '• You are welcome to reach out anytime with questions about scheduling, treatment, or how therapy works.';
+
+    var TEEN_CLOSING =
+      'Thank you for trusting us with your teen’s care. We look forward to working together.\n\n' +
+      'Warmly,\nAshé Counseling & Coaching LLC';
+
+    function locOrVirtual(prefix) {
+      if (isVirtual) return VIRTUAL_LINK_NOTE;
+      return locationBlock(
+        document.getElementById(prefix + '-south').checked,
+        document.getElementById(prefix + '-logan').checked
+      );
+    }
+
+    function buildTeenMsg(provider, email, billingPara, insurancePara) {
+      var prefixMap = { deductible: 'ded', copay: 'cop', medicaid: 'med', covered: 'cov' };
+      var loc = locOrVirtual(prefixMap[currentTab]);
+      return TEEN_INTRO + '\n\n' +
+        'We’re looking forward to seeing your teen at their upcoming ' + apptWord + ' appointment with ' + provider + '.\n' +
+        'Provider Email: ' + email + '\n\n' +
+        billingPara + '\n\n' +
+        loc + '\n\n' +
+        TEEN_AS_WE_BEGIN + '\n\n' +
+        insurancePara + '\n\n' +
+        TEEN_CLOSING;
+    }
+
+    if (currentTab === 'deductible') {
+      var pi       = getProviderInfo('ded');
+      var provider = pi.name;
+      var email    = pi.email;
+      var cost     = document.getElementById('ded-cost').value.trim()       || '[Cost]';
+      var ded      = document.getElementById('ded-deductible').value.trim() || '[Deductible Amount]';
+
+      if (isTeen) {
+        var billingPara =
+          'We’d like to let you know that the estimated cost for this visit is $' + cost + '. This amount will be charged to the card we have on file within 24 hours of the appointment.\n\n' +
+          'This charge is based on the insurance plan on file, which shows a remaining annual deductible of $' + ded + '. Until the deductible is met, the full session cost applies.';
+        msg = buildTeenMsg(provider, email, billingPara, INSURANCE_STANDARD);
+      } else {
+        msg = 'Welcome! We’re looking forward to seeing you at your upcoming ' + apptWord + ' appointment with ' + provider + '.\n' +
+              'Provider Email: ' + email + '\n\n' +
+              'We’d like to let you know that your estimated cost for this visit is $' + cost + '. This amount will be charged to the card we have on file within 24 hours of your appointment.\n\n' +
+              'This charge is based on your insurance plan, which shows you still have $' + ded + ' remaining on your annual deductible. Until your deductible is met, you are responsible for the full cost of each session.\n\n' +
+              locOrVirtual('ded') + '\n\n' +
+              'If you have any questions about how your deductible works or need help understanding your insurance coverage, please don’t hesitate to reach out. We’re here to help!\n\n' +
+              INSURANCE_STANDARD + '\n\n' +
+              'Thank you again, and we look forward to supporting you!\n\nWarmly,\nAshe Counseling & Coaching LLC';
+      }
+
+    } else if (currentTab === 'copay') {
+      var pi       = getProviderInfo('cop');
+      var provider = pi.name;
+      var email    = pi.email;
+      var cost     = document.getElementById('cop-cost').value.trim() || '[Copay Amount]';
+
+      if (isTeen) {
+        var billingPara =
+          'Your teen’s cost for this visit is $' + cost + '. This amount will be charged to the card we have on file within 24 hours of the appointment.';
+        msg = buildTeenMsg(provider, email, billingPara, INSURANCE_STANDARD);
+      } else {
+        msg = 'Welcome! We’re looking forward to seeing you at your upcoming ' + apptWord + ' appointment with ' + provider + '.\n' +
+              'Provider Email: ' + email + '\n\n' +
+              'Your cost for this visit is $' + cost + '. This amount will be charged to the card on file within 24 hours of your appointment.\n\n' +
+              locOrVirtual('cop') + '\n\n' +
+              'If you have any questions about your copay or coverage, feel free to reach out—we’re happy to help clarify anything you need.\n\n' +
+              INSURANCE_STANDARD + '\n\n' +
+              'Thank you again, and we look forward to supporting you!\n\nWarmly,\nAshe Counseling & Coaching LLC';
+      }
+
+    } else if (currentTab === 'medicaid') {
+      var pi       = getProviderInfo('med');
+      var provider = pi.name;
+      var email    = pi.email;
+      var month    = document.getElementById('med-month').value.trim() || '[Month]';
+
+      var MEDICAID_NOTE =
+        'Important Note:\n' +
+        'Ashé Counseling & Coaching LLC verifies Medicaid coverage monthly to ensure there are no interruptions in your care. ' +
+        'While there is no cost under the current plan, please remember that any changes in insurance status may affect eligibility or benefits.';
+
+      if (isTeen) {
+        var billingPara =
+          'We’ve verified your teen’s Medicaid coverage for the month of ' + month + ', and we’re happy to confirm that there is no cost for this session.';
+        msg = buildTeenMsg(provider, email, billingPara, MEDICAID_NOTE);
+      } else {
+        msg = 'Welcome! We’re looking forward to seeing you at your upcoming ' + apptWord + ' appointment with ' + provider + '.\n' +
+              'Provider Email: ' + email + '\n\n' +
+              'We’ve verified your Medicaid coverage for the month of ' + month + ', and we’re happy to confirm that there is no cost to you for this session.\n\n' +
+              locOrVirtual('med') + '\n\n' +
+              'If you have any questions about your coverage or future appointments, please don’t hesitate to reach out—we’re here to help!\n\n' +
+              MEDICAID_NOTE + '\n\n' +
+              'Thank you again, and we look forward to supporting you!\n\nWarmly,\nAshe Counseling & Coaching LLC';
+      }
+
+    } else if (currentTab === 'covered') {
+      var pi       = getProviderInfo('cov');
+      var provider = pi.name;
+      var email    = pi.email;
+
+      if (isTeen) {
+        var billingPara =
+          'We’re pleased to confirm there is no cost for this session—your teen’s insurance covers sessions at 100%' +
+          (isVirtual ? ' with no copay, as the deductible has been met.' : ' with no copay.');
+        msg = buildTeenMsg(provider, email, billingPara, INSURANCE_STANDARD);
+      } else {
+        var costLine = isVirtual
+          ? 'Your cost for this visit is $0.00, as your insurance covers sessions at 100% with no copay due to your deductible being met.'
+          : 'Your cost for this visit is $0.00, as your insurance covers sessions at 100% with no copay.';
+
+        msg = 'Welcome! We’re looking forward to seeing you at your upcoming ' + apptWord + ' appointment with ' + provider + '.\n' +
+              'Provider Email: ' + email + '\n\n' +
+              costLine + '\n\n' +
+              locOrVirtual('cov') + '\n\n' +
+              'If you have any questions about your coverage, feel free to reach out—we’re happy to help clarify anything you need.\n\n' +
+              INSURANCE_STANDARD + '\n\n' +
+              'Thank you again, and we look forward to supporting you!\n\nWarmly,\nAshe Counseling & Coaching LLC';
+      }
+    }
+
+    document.getElementById('message-output').textContent = msg;
+
+    var badge = document.getElementById('output-badge');
+    if (isTeen) {
+      badge.textContent = '👦🏽 Teen Client';
+      badge.className   = 'appt-badge teen';
+    } else {
+      badge.textContent = isVirtual ? '💻 Virtual' : '🏢 In-Person';
+      badge.className   = 'appt-badge' + (isVirtual ? ' virtual' : '');
+    }
+
+    var card = document.getElementById('output-card');
+    card.classList.add('visible');
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    var copyBtn = document.getElementById('copy-btn');
+    copyBtn.textContent = 'Copy Message';
+    copyBtn.classList.remove('copied');
+  }
+
+  /* ── Init ── */
+  document.addEventListener('DOMContentLoaded', populateDropdowns);
+
+  /* ── Copy ── */
+  function copyMessage() {
+    var text = document.getElementById('message-output').textContent;
+    navigator.clipboard.writeText(text).then(function() {
+      var btn = document.getElementById('copy-btn');
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'Copy Message';
+        btn.classList.remove('copied');
+      }, 2500);
+    });
+  }
+</script>
+</body>
+</html>
