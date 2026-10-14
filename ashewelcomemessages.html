@@ -164,6 +164,41 @@
       cursor: pointer;
     }
 
+    .teen-toggle-wrap { flex-wrap: wrap; }
+
+    /* ── Couples Panel ── */
+    .couples-panel {
+      display: none;
+      background: var(--sage-light);
+      border: 1.5px solid var(--sage-mid);
+      border-radius: 12px;
+      padding: 18px 20px 14px;
+      margin-bottom: 24px;
+    }
+
+    .couples-panel h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 4px;
+    }
+
+    .couples-panel .hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .field .hint-inline {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 500;
+    }
+
     /* ── Template Tabs ── */
     .tabs {
       display: flex;
@@ -231,6 +266,7 @@
 
     input[type="text"],
     input[type="email"],
+    input[type="month"],
     select {
       padding: 9px 13px;
       border: 1.5px solid var(--border);
@@ -244,6 +280,7 @@
 
     input[type="text"]:focus,
     input[type="email"]:focus,
+    input[type="month"]:focus,
     select:focus {
       outline: none;
       border-color: var(--dark);
@@ -353,6 +390,7 @@
 
     .appt-badge.virtual { background: var(--sage-light); color: var(--sage); border-color: var(--sage-mid); }
     .appt-badge.teen    { background: var(--sage); color: var(--card); border-color: var(--sage); }
+    .appt-badge.couples { background: var(--dark); color: var(--card); border-color: var(--dark); }
 
     .output-title-row {
       display: flex;
@@ -423,8 +461,12 @@
   <!-- Teen Toggle -->
   <div class="teen-toggle-wrap">
     <label>
-      <input type="checkbox" id="teen-client" />
+      <input type="checkbox" id="teen-client" onchange="setClientMode('teen')" />
       👦🏽 Teen / Adolescent Client
+    </label>
+    <label>
+      <input type="checkbox" id="couples-client" onchange="setClientMode('couples')" />
+      💑 Couples Appointment
     </label>
   </div>
 
@@ -434,6 +476,34 @@
     <button class="tab-btn" onclick="switchTab('copay', this)"> Copay</button>
     <button class="tab-btn" onclick="switchTab('medicaid', this)"> Medicaid</button>
     <button class="tab-btn" onclick="switchTab('covered', this)"> Covered 100%</button>
+    <button class="tab-btn" onclick="switchTab('selfpay', this)"> Self-Pay</button>
+  </div>
+
+  <!-- ── COUPLES PANEL (shown when Couples Appointment is checked) ── -->
+  <div id="couples-panel" class="couples-panel">
+    <h2>Couples Details</h2>
+    <p class="hint">Couples sessions bill one partner's insurance. Enter both first names and choose whose insurance is being billed, then fill in the template fields below.</p>
+    <div class="fields-grid">
+      <div class="field">
+        <label>Client 1 First Name</label>
+        <input type="text" id="cpl-name1" placeholder="e.g. Jordan" oninput="updateCouplesOptions()" />
+      </div>
+      <div class="field">
+        <label>Client 2 First Name</label>
+        <input type="text" id="cpl-name2" placeholder="e.g. Taylor" oninput="updateCouplesOptions()" />
+      </div>
+      <div class="field" id="cpl-billed-row">
+        <label>Insurance Being Billed</label>
+        <select id="cpl-billed" onchange="updateCouplesOptions()">
+          <option value="1">Client 1's insurance</option>
+          <option value="2">Client 2's insurance</option>
+        </select>
+      </div>
+      <div class="field" id="cpl-other-row">
+        <label>Other Partner's Cost / Session ($) <span class="hint-inline">— optional</span></label>
+        <input type="text" id="cpl-other-cost" placeholder="e.g. 60" />
+      </div>
+    </div>
   </div>
 
   <!-- ── FIELDS: DEDUCTIBLE ── -->
@@ -511,8 +581,12 @@
         </select>
       </div>
       <div class="field">
-        <label>Coverage Month(s)</label>
-        <input type="text" id="med-month" placeholder="e.g. April  or  March and April" />
+        <label>Coverage Month</label>
+        <input type="month" id="med-month" />
+      </div>
+      <div class="field">
+        <label>Through Month <span class="hint-inline">— optional</span></label>
+        <input type="month" id="med-month-end" />
       </div>
       <div class="field full" id="med-location-row">
         <label>Location(s) to Include</label>
@@ -543,6 +617,34 @@
         <div class="location-group">
           <label><input type="checkbox" id="cov-south" checked /> River North </label>
           <label><input type="checkbox" id="cov-logan" checked /> Logan Square</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FIELDS: SELF-PAY ── -->
+  <div id="fields-selfpay" class="fields-section" style="display:none">
+    <h2>Self-Pay Template — Client Details</h2>
+    <div class="virtual-notice" id="vnotice-selfpay">
+      <strong>Virtual Appointment</strong>
+      The link note will be included automatically: "The link to your virtual appointment will be sent via a confirmation 30 minutes prior to your scheduled time."
+    </div>
+    <div class="fields-grid">
+      <div class="field full">
+        <label>Provider</label>
+        <select id="sp-provider" onchange="syncProviders('sp')">
+          <option value="">— Select Clinician —</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Cost Per Session ($)</label>
+        <input type="text" id="sp-cost" value="145" />
+      </div>
+      <div class="field full" id="sp-location-row">
+        <label>Location(s) to Include</label>
+        <div class="location-group">
+          <label><input type="checkbox" id="sp-south" checked /> River North</label>
+          <label><input type="checkbox" id="sp-logan" checked /> Logan Square</label>
         </div>
       </div>
     </div>
@@ -603,7 +705,61 @@
     { name: 'Anahy',     email: 'anahy@ashecc.com' }
   ];
 
-  const PREFIXES = ['ded', 'cop', 'med', 'cov'];
+  const PREFIXES = ['ded', 'cop', 'med', 'cov', 'sp'];
+  const TABS     = ['deductible', 'copay', 'medicaid', 'covered', 'selfpay'];
+
+  function val(id) {
+    var el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  /* ── Month picker helpers (Medicaid) ── */
+  var MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  function fmtMonth(v) {
+    var m = /^(\d{4})-(\d{2})$/.exec(v);
+    if (!m) return v; // browsers without a month picker fall back to plain text
+    return MONTH_NAMES[parseInt(m[2], 10) - 1] + ' ' + m[1];
+  }
+
+  function medMonthPhrase() {
+    var s = val('med-month');
+    var e = val('med-month-end');
+    if (!s) return 'the month of [Month]';
+    if (!e || e === s) return 'the month of ' + fmtMonth(s);
+    return fmtMonth(s) + ' through ' + fmtMonth(e);
+  }
+
+  function setDefaultMonth() {
+    var d = new Date();
+    var el = document.getElementById('med-month');
+    if (el && !el.value) el.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  }
+
+  /* ── Teen / Couples mode (mutually exclusive) ── */
+  function setClientMode(mode) {
+    var teen    = document.getElementById('teen-client');
+    var couples = document.getElementById('couples-client');
+    if (mode === 'teen' && teen.checked)       couples.checked = false;
+    if (mode === 'couples' && couples.checked) teen.checked = false;
+    document.getElementById('couples-panel').style.display = couples.checked ? 'block' : 'none';
+    updateCouplesOptions();
+    document.getElementById('output-card').classList.remove('visible');
+  }
+
+  function updateCouplesOptions() {
+    var n1 = val('cpl-name1') || 'Client 1';
+    var n2 = val('cpl-name2') || 'Client 2';
+    var sel = document.getElementById('cpl-billed');
+    sel.options[0].textContent = n1 + '’s insurance';
+    sel.options[1].textContent = n2 + '’s insurance';
+    var otherName = sel.value === '1' ? n2 : n1;
+    document.querySelector('#cpl-other-row label').innerHTML =
+      otherName + '’s Cost / Session ($) <span class="hint-inline">— optional</span>';
+    var isSelfPay = (currentTab === 'selfpay');
+    document.getElementById('cpl-billed-row').style.display = isSelfPay ? 'none' : '';
+    document.getElementById('cpl-other-row').style.display  = isSelfPay ? 'none' : '';
+  }
 
   function populateDropdowns() {
     PREFIXES.forEach(function(prefix) {
@@ -649,7 +805,7 @@
     document.getElementById('btn-inperson').classList.toggle('active', type === 'inperson');
     document.getElementById('btn-virtual').classList.toggle('active',  type === 'virtual');
 
-    ['deductible','copay','medicaid','covered'].forEach(function(t) {
+    TABS.forEach(function(t) {
       var locRow = document.getElementById(getPrefix(t) + '-location-row');
       var notice = document.getElementById('vnotice-' + t);
       if (locRow) locRow.style.display = (type === 'inperson') ? '' : 'none';
@@ -660,7 +816,7 @@
   }
 
   function getPrefix(tab) {
-    var map = { deductible: 'ded', copay: 'cop', medicaid: 'med', covered: 'cov' };
+    var map = { deductible: 'ded', copay: 'cop', medicaid: 'med', covered: 'cov', selfpay: 'sp' };
     return map[tab];
   }
 
@@ -672,6 +828,7 @@
     document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
     setApptType(apptType);
+    updateCouplesOptions();
     document.getElementById('output-card').classList.remove('visible');
   }
 
@@ -721,8 +878,7 @@
     }
 
     function buildTeenMsg(provider, email, billingPara, insurancePara) {
-      var prefixMap = { deductible: 'ded', copay: 'cop', medicaid: 'med', covered: 'cov' };
-      var loc = locOrVirtual(prefixMap[currentTab]);
+      var loc = locOrVirtual(getPrefix(currentTab));
       return TEEN_INTRO + '\n\n' +
         'We’re looking forward to seeing your teen at their upcoming ' + apptWord + ' appointment with ' + provider + '.\n' +
         'Provider Email: ' + email + '\n\n' +
@@ -733,7 +889,102 @@
         TEEN_CLOSING;
     }
 
-    if (currentTab === 'deductible') {
+    var isCouples = document.getElementById('couples-client').checked;
+
+    var MEDICAID_NOTE =
+      'Important Note:\n' +
+      'Ashé Counseling & Coaching LLC verifies Medicaid coverage monthly to ensure there are no interruptions in your care. ' +
+      'While there is no cost under the current plan, please remember that any changes in insurance status may affect eligibility or benefits.';
+
+    var SELF_PAY_NOTE =
+      'Important Note About Self-Pay:\n' +
+      'Because you are paying out of pocket, we will not file claims with an insurance company for your sessions. ' +
+      'If you obtain insurance coverage and would like to use it, please let us know before your next appointment so we can verify your benefits. ' +
+      'As a self-pay client, you also have the right to receive a Good Faith Estimate of the expected cost of your care—just let us know if you would like one.';
+
+    var CLOSING = 'Thank you again, and we look forward to supporting you!\n\nWarmly,\nAshe Counseling & Coaching LLC';
+
+    /* ── Couples message ── */
+    function buildCouplesMsg() {
+      var pi       = getProviderInfo(getPrefix(currentTab));
+      var n1       = val('cpl-name1') || '[Client 1]';
+      var n2       = val('cpl-name2') || '[Client 2]';
+      var billedIs1 = document.getElementById('cpl-billed').value === '1';
+      var billed   = billedIs1 ? n1 : n2;
+      var other    = billedIs1 ? n2 : n1;
+      var otherCost = val('cpl-other-cost');
+      var loc      = locOrVirtual(getPrefix(currentTab));
+
+      var out = 'Hi ' + n1 + ' and ' + n2 + ',\n\n' +
+        'Welcome! We’re looking forward to seeing you both at your upcoming ' + apptWord + ' couples appointment with ' + pi.name + '.\n' +
+        'Provider Email: ' + pi.email + '\n\n';
+
+      if (currentTab === 'selfpay') {
+        var spCost = val('sp-cost') || '145';
+        return out +
+          'Since you’ll be paying out of pocket, your cost for each couples session is $' + spCost + '. This amount will be charged to the card we have on file within 24 hours of your appointment.\n\n' +
+          loc + '\n\n' +
+          'If you have any questions about self-pay or would like to use insurance in the future, please don’t hesitate to reach out—we’re here to help!\n\n' +
+          SELF_PAY_NOTE + '\n\n' + CLOSING;
+      }
+
+      var arrangement =
+        'How Billing Works for Couples Sessions:\n' +
+        'Because couples sessions are one shared appointment, we bill only one partner’s insurance. ' +
+        'We verified both of your insurance plans to find the lower cost per session, and we will be billing ' + billed + '’s insurance for your sessions.' +
+        (otherCost ? ' For comparison, the estimated cost per session on ' + other + '’s insurance is $' + otherCost + '.' : '');
+
+      var costPara, note = INSURANCE_STANDARD;
+      if (currentTab === 'deductible') {
+        var c = val('ded-cost') || '[Cost]';
+        var d = val('ded-deductible') || '[Deductible Amount]';
+        costPara = 'Your estimated cost per session is $' + c + '. ' + billed + '’s plan shows $' + d + ' remaining on the annual deductible, and until the deductible is met, the full session cost applies. ' +
+                   'This amount will be charged to the card we have on file within 24 hours of your appointment.';
+      } else if (currentTab === 'copay') {
+        var cp = val('cop-cost') || '[Copay Amount]';
+        costPara = 'Your cost per session is $' + cp + ', which is the copay under ' + billed + '’s plan. This amount will be charged to the card we have on file within 24 hours of your appointment.';
+      } else if (currentTab === 'medicaid') {
+        costPara = 'We’ve verified ' + billed + '’s Medicaid coverage for ' + medMonthPhrase() + ', and we’re happy to confirm that there is no cost to you for this session.';
+        note = MEDICAID_NOTE;
+      } else {
+        costPara = 'Your cost per session is $0.00, as ' + billed + '’s insurance covers sessions at 100% with no copay.';
+      }
+
+      var changeNote =
+        'Please Let Us Know About Insurance Changes:\n' +
+        'If ' + billed + '’s insurance becomes inactive or changes for any reason, or if there are any changes to either of your plans, it’s very important that you let us know before your next appointment. ' +
+        'This allows us to re-verify your benefits, bill the correct insurance, and confirm the correct cost per session so there are no unexpected balances.';
+
+      return out +
+        arrangement + '\n\n' +
+        costPara + '\n\n' +
+        loc + '\n\n' +
+        changeNote + '\n\n' +
+        'If you have any questions about this billing arrangement or your coverage, please don’t hesitate to reach out—we’re here to help!\n\n' +
+        note + '\n\n' + CLOSING;
+    }
+
+    if (isCouples) {
+      msg = buildCouplesMsg();
+
+    } else if (currentTab === 'selfpay') {
+      var pi       = getProviderInfo('sp');
+      var spCost   = val('sp-cost') || '145';
+
+      if (isTeen) {
+        var billingPara =
+          'Since you’ll be paying out of pocket, the cost for each of your teen’s sessions is $' + spCost + '. This amount will be charged to the card we have on file within 24 hours of the appointment.';
+        msg = buildTeenMsg(pi.name, pi.email, billingPara, SELF_PAY_NOTE);
+      } else {
+        msg = 'Welcome! We’re looking forward to seeing you at your upcoming ' + apptWord + ' appointment with ' + pi.name + '.\n' +
+              'Provider Email: ' + pi.email + '\n\n' +
+              'Since you’ll be paying out of pocket, your cost for each session is $' + spCost + '. This amount will be charged to the card we have on file within 24 hours of your appointment.\n\n' +
+              locOrVirtual('sp') + '\n\n' +
+              'If you have any questions about self-pay or would like to use insurance in the future, please don’t hesitate to reach out—we’re here to help!\n\n' +
+              SELF_PAY_NOTE + '\n\n' + CLOSING;
+      }
+
+    } else if (currentTab === 'deductible') {
       var pi       = getProviderInfo('ded');
       var provider = pi.name;
       var email    = pi.email;
@@ -780,21 +1031,16 @@
       var pi       = getProviderInfo('med');
       var provider = pi.name;
       var email    = pi.email;
-      var month    = document.getElementById('med-month').value.trim() || '[Month]';
-
-      var MEDICAID_NOTE =
-        'Important Note:\n' +
-        'Ashé Counseling & Coaching LLC verifies Medicaid coverage monthly to ensure there are no interruptions in your care. ' +
-        'While there is no cost under the current plan, please remember that any changes in insurance status may affect eligibility or benefits.';
+      var month    = medMonthPhrase();
 
       if (isTeen) {
         var billingPara =
-          'We’ve verified your teen’s Medicaid coverage for the month of ' + month + ', and we’re happy to confirm that there is no cost for this session.';
+          'We’ve verified your teen’s Medicaid coverage for ' + month + ', and we’re happy to confirm that there is no cost for this session.';
         msg = buildTeenMsg(provider, email, billingPara, MEDICAID_NOTE);
       } else {
         msg = 'Welcome! We’re looking forward to seeing you at your upcoming ' + apptWord + ' appointment with ' + provider + '.\n' +
               'Provider Email: ' + email + '\n\n' +
-              'We’ve verified your Medicaid coverage for the month of ' + month + ', and we’re happy to confirm that there is no cost to you for this session.\n\n' +
+              'We’ve verified your Medicaid coverage for ' + month + ', and we’re happy to confirm that there is no cost to you for this session.\n\n' +
               locOrVirtual('med') + '\n\n' +
               'If you have any questions about your coverage or future appointments, please don’t hesitate to reach out—we’re here to help!\n\n' +
               MEDICAID_NOTE + '\n\n' +
@@ -829,7 +1075,10 @@
     document.getElementById('message-output').textContent = msg;
 
     var badge = document.getElementById('output-badge');
-    if (isTeen) {
+    if (isCouples) {
+      badge.textContent = '💑 Couples' + (isVirtual ? ' · Virtual' : '');
+      badge.className   = 'appt-badge couples';
+    } else if (isTeen) {
       badge.textContent = '👦🏽 Teen Client';
       badge.className   = 'appt-badge teen';
     } else {
@@ -847,7 +1096,10 @@
   }
 
   /* ── Init ── */
-  document.addEventListener('DOMContentLoaded', populateDropdowns);
+  document.addEventListener('DOMContentLoaded', function() {
+    populateDropdowns();
+    setDefaultMonth();
+  });
 
   /* ── Copy ── */
   function copyMessage() {
