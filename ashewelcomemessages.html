@@ -462,11 +462,11 @@
   <div class="teen-toggle-wrap">
     <label>
       <input type="checkbox" id="teen-client" onchange="setClientMode('teen')" />
-      👦🏽 Teen / Adolescent Client
+      Teen / Adolescent Client
     </label>
     <label>
       <input type="checkbox" id="couples-client" onchange="setClientMode('couples')" />
-      💑 Couples Appointment
+      Couples Appointment
     </label>
   </div>
 
@@ -701,6 +701,8 @@
 
   const PREFIXES = ['ded', 'cop', 'med', 'cov', 'sp'];
   const TABS     = ['deductible', 'copay', 'medicaid', 'covered', 'selfpay'];
+  const SELF_PAY_RATE         = '145';  // individual / teen self-pay per session
+  const COUPLES_SELF_PAY_RATE = '165';  // couples self-pay per session
 
   function val(id) {
     var el = document.getElementById(id);
@@ -737,6 +739,10 @@
     if (mode === 'teen' && teen.checked)       couples.checked = false;
     if (mode === 'couples' && couples.checked) teen.checked = false;
     document.getElementById('couples-panel').style.display = couples.checked ? 'block' : 'none';
+    var spCost = document.getElementById('sp-cost');
+    if (spCost.value === SELF_PAY_RATE || spCost.value === COUPLES_SELF_PAY_RATE || spCost.value === '') {
+      spCost.value = couples.checked ? COUPLES_SELF_PAY_RATE : SELF_PAY_RATE;
+    }
     updateCouplesOptions();
     document.getElementById('output-card').classList.remove('visible');
   }
@@ -914,7 +920,7 @@
         'Provider Email: ' + pi.email + '\n\n';
 
       if (currentTab === 'selfpay') {
-        var spCost = val('sp-cost') || '145';
+        var spCost = val('sp-cost') || COUPLES_SELF_PAY_RATE;
         return out +
           'Since you’ll be paying out of pocket, your cost for each couples session is $' + spCost + '. This amount will be charged to the card we have on file within 24 hours of your appointment.\n\n' +
           loc + '\n\n' +
@@ -963,7 +969,7 @@
 
     } else if (currentTab === 'selfpay') {
       var pi       = getProviderInfo('sp');
-      var spCost   = val('sp-cost') || '145';
+      var spCost   = val('sp-cost') || SELF_PAY_RATE;
 
       if (isTeen) {
         var billingPara =
@@ -1070,10 +1076,10 @@
 
     var badge = document.getElementById('output-badge');
     if (isCouples) {
-      badge.textContent = '💑 Couples' + (isVirtual ? ' · Virtual' : '');
+      badge.textContent = 'Couples' + (isVirtual ? ' · Virtual' : '');
       badge.className   = 'appt-badge couples';
     } else if (isTeen) {
-      badge.textContent = '👦🏽 Teen Client';
+      badge.textContent = 'Teen Client';
       badge.className   = 'appt-badge teen';
     } else {
       badge.textContent = isVirtual ? '💻 Virtual' : '🏢 In-Person';
