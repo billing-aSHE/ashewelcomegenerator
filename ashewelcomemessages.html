@@ -529,11 +529,12 @@
         <input type="text" id="ded-deductible" placeholder="e.g. 4000" />
       </div>
       <div class="field full" id="ded-location-row">
-        <label>Location(s) to Include</label>
-        <div class="location-group">
-          <label><input type="checkbox" id="ded-south" checked /> River North</label>
-          <label><input type="checkbox" id="ded-logan" checked /> Logan Square</label>
-        </div>
+        <label>Location</label>
+        <select id="ded-location" onchange="syncLocations('ded')">
+          <option value="">— Select Location —</option>
+          <option value="rivernorth">River North — 40 E Huron</option>
+          <option value="logan">Logan Square — 2653 N Kedzie</option>
+        </select>
       </div>
     </div>
   </div>
@@ -557,11 +558,12 @@
         <input type="text" id="cop-cost" placeholder="e.g. 25" />
       </div>
       <div class="field full" id="cop-location-row">
-        <label>Location(s) to Include</label>
-        <div class="location-group">
-          <label><input type="checkbox" id="cop-south" checked /> River North</label>
-          <label><input type="checkbox" id="cop-logan" checked /> Logan Square</label>
-        </div>
+        <label>Location</label>
+        <select id="cop-location" onchange="syncLocations('cop')">
+          <option value="">— Select Location —</option>
+          <option value="rivernorth">River North — 40 E Huron</option>
+          <option value="logan">Logan Square — 2653 N Kedzie</option>
+        </select>
       </div>
     </div>
   </div>
@@ -589,11 +591,12 @@
         <input type="month" id="med-month-end" />
       </div>
       <div class="field full" id="med-location-row">
-        <label>Location(s) to Include</label>
-        <div class="location-group">
-          <label><input type="checkbox" id="med-south" checked /> River North </label>
-          <label><input type="checkbox" id="med-logan" checked /> Logan Square</label>
-        </div>
+        <label>Location</label>
+        <select id="med-location" onchange="syncLocations('med')">
+          <option value="">— Select Location —</option>
+          <option value="rivernorth">River North — 40 E Huron</option>
+          <option value="logan">Logan Square — 2653 N Kedzie</option>
+        </select>
       </div>
     </div>
   </div>
@@ -613,11 +616,12 @@
         </select>
       </div>
       <div class="field full" id="cov-location-row">
-        <label>Location(s) to Include</label>
-        <div class="location-group">
-          <label><input type="checkbox" id="cov-south" checked /> River North </label>
-          <label><input type="checkbox" id="cov-logan" checked /> Logan Square</label>
-        </div>
+        <label>Location</label>
+        <select id="cov-location" onchange="syncLocations('cov')">
+          <option value="">— Select Location —</option>
+          <option value="rivernorth">River North — 40 E Huron</option>
+          <option value="logan">Logan Square — 2653 N Kedzie</option>
+        </select>
       </div>
     </div>
   </div>
@@ -641,11 +645,12 @@
         <input type="text" id="sp-cost" value="145" />
       </div>
       <div class="field full" id="sp-location-row">
-        <label>Location(s) to Include</label>
-        <div class="location-group">
-          <label><input type="checkbox" id="sp-south" checked /> River North</label>
-          <label><input type="checkbox" id="sp-logan" checked /> Logan Square</label>
-        </div>
+        <label>Location</label>
+        <select id="sp-location" onchange="syncLocations('sp')">
+          <option value="">— Select Location —</option>
+          <option value="rivernorth">River North — 40 E Huron</option>
+          <option value="logan">Logan Square — 2653 N Kedzie</option>
+        </select>
       </div>
     </div>
   </div>
@@ -833,12 +838,18 @@
   }
 
   /* ── Location block (in-person only) ── */
-  function locationBlock(southChecked, loganChecked) {
-    var lines = [];
-    if (southChecked || loganChecked) lines.push('Location Details:');
-    if (southChecked) lines.push('• River North: 40 E Huron, Chicago, IL 60611 – Please call “Ashe Counseling” on the call box when you arrive.');
-    if (loganChecked) lines.push('• Logan Square: 2653 N Kedzie, Chicago, IL – Please ring the doorbell when you arrive.');
-    return lines.join('\n');
+  function locationBlock(loc) {
+    if (loc === 'rivernorth') return 'Location Details:\n• River North: 40 E Huron, Chicago, IL 60611 – Please call “Ashe Counseling” on the call box when you arrive.';
+    if (loc === 'logan')      return 'Location Details:\n• Logan Square: 2653 N Kedzie, Chicago, IL – Please ring the doorbell when you arrive.';
+    return 'Location Details:\n• [Select a location]';
+  }
+
+  function syncLocations(changedPrefix) {
+    var v = document.getElementById(changedPrefix + '-location').value;
+    PREFIXES.forEach(function(prefix) {
+      var el = document.getElementById(prefix + '-location');
+      if (el && prefix !== changedPrefix) el.value = v;
+    });
   }
 
   /* ── Generate ── */
@@ -871,10 +882,7 @@
 
     function locOrVirtual(prefix) {
       if (isVirtual) return VIRTUAL_LINK_NOTE;
-      return locationBlock(
-        document.getElementById(prefix + '-south').checked,
-        document.getElementById(prefix + '-logan').checked
-      );
+      return locationBlock(document.getElementById(prefix + '-location').value);
     }
 
     function buildTeenMsg(provider, email, billingPara, insurancePara) {
