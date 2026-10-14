@@ -721,9 +721,9 @@
   function medMonthPhrase() {
     var s = val('med-month');
     var e = val('med-month-end');
-    if (!s) return 'the month of [Month]';
-    if (!e || e === s) return 'the month of ' + fmtMonth(s);
-    return fmtMonth(s) + ' through ' + fmtMonth(e);
+    if (!s) return 'within the month of [Month]';
+    if (!e || e === s) return 'within the month of ' + fmtMonth(s);
+    return 'from ' + fmtMonth(s) + ' through ' + fmtMonth(e);
   }
 
   function setDefaultMonth() {
@@ -944,7 +944,7 @@
         var cp = val('cop-cost') || '[Copay Amount]';
         costPara = 'Your cost per session is $' + cp + ', which is the copay under ' + billed + '’s plan. This amount will be charged to the card we have on file within 24 hours of your appointment.';
       } else if (currentTab === 'medicaid') {
-        costPara = 'We’ve verified ' + billed + '’s Medicaid coverage for ' + medMonthPhrase() + ', and we’re happy to confirm that there is no cost to you for this session.';
+        costPara = 'We’ve verified ' + billed + '’s Medicaid coverage, and we’re happy to confirm that there is no cost to you for your sessions ' + medMonthPhrase() + '.';
         note = MEDICAID_NOTE;
       } else {
         costPara = 'Your cost per session is $0.00, as ' + billed + '’s insurance covers sessions at 100% with no copay.';
@@ -1035,12 +1035,12 @@
 
       if (isTeen) {
         var billingPara =
-          'We’ve verified your teen’s Medicaid coverage for ' + month + ', and we’re happy to confirm that there is no cost for this session.';
+          'We’ve verified your teen’s Medicaid coverage, and we’re happy to confirm that there is no cost for your teen’s sessions ' + month + '.';
         msg = buildTeenMsg(provider, email, billingPara, MEDICAID_NOTE);
       } else {
         msg = 'Welcome! We’re looking forward to seeing you at your upcoming ' + apptWord + ' appointment with ' + provider + '.\n' +
               'Provider Email: ' + email + '\n\n' +
-              'We’ve verified your Medicaid coverage for ' + month + ', and we’re happy to confirm that there is no cost to you for this session.\n\n' +
+              'We’ve verified your Medicaid coverage, and we’re happy to confirm that there is no cost to you for your sessions ' + month + '.\n\n' +
               locOrVirtual('med') + '\n\n' +
               'If you have any questions about your coverage or future appointments, please don’t hesitate to reach out—we’re here to help!\n\n' +
               MEDICAID_NOTE + '\n\n' +
